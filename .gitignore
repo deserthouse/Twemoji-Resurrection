@@ -1,0 +1,5 @@
+# Build artifacts
+*.zip
+
+# Local test screenshots
+.test-*.png

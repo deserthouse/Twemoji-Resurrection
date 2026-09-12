@@ -1,0 +1,45 @@
+# Twemoji Resurrection
+
+Systemlessly replaces your Android system emoji with **Twemoji** (Twitter Emoji), currently shipping **Twemoji 17.0.3** (Emoji 17.0).
+
+![Proof on Android 16](a16-twemoji-proof.png)
+
+## Compatibility
+
+| Root manager | Mounting |
+| --- | --- |
+| KernelSU / SukiSU / APatch (bare, no mount metamodule) | Module **self-mounts** via `post-fs-data.sh` bind-mounts |
+| Magisk | Native Magic Mount |
+| KernelSU / SukiSU with a Magic Mount / OverlayFS metamodule | Metamodule mounts; self-mount is a verified no-op |
+
+Both mounting paths can coexist safely: the self-mount checks whether the target font already serves the module's Twemoji file before mounting.
+
+## Installation
+
+1. Download `Twemoji-Resurrection-<version>-ksu.zip` from [Releases](https://github.com/deserthouse/Twemoji-Resurrection/releases).
+2. Flash it from your root manager's module page.
+3. Reboot.
+
+A system font change is only picked up on reboot (the font cache is built at boot).
+
+## Features
+
+- **In-app update check** — the module ships an `updateJson`, so KernelSU, SukiSU, APatch and Magisk managers offer the new version directly from the module list.
+- **Live status in the module description** — at every boot the module verifies that every emoji font slot actually serves Twemoji and rewrites its own description:
+  - `✅ Twemoji active (n/n emoji fonts)` — fully working
+  - `⚠️ Twemoji partial (x/n emoji fonts)` — some slots not overridden
+  - `❌ Twemoji not active` — mounting failed; check your manager's mount settings
+
+## How it works
+
+The module drops a CBDT/CBLC Twemoji build of `NotoColorEmoji.ttf` into `system/fonts` and symlinks every emoji font declared in the system font config (`fonts.xml`, or `font_fallback.xml` on Android 15+) to it, so all `und-Zsye` slots resolve to Twemoji.
+
+## Credits
+
+- **Gontier Julien** — [Twemoji Remastered](https://github.com/Gontier-Julien/Twemoji-Remastered), the upstream this project continues.
+- **Twitter / X and Twemoji contributors** — the emoji artwork.
+- Font built from the [twemoji-color-font](https://github.com/13rac1/twemoji-color-font) CBDT/CBLC packaging.
+
+## License
+
+The module scripts are licensed under the [GNU GPL v3](LICENSE). The Twemoji graphics and the bundled font remain under their original licenses (CC-BY 4.0 for the graphics; see the font project for font licensing details).
