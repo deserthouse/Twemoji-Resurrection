@@ -34,6 +34,11 @@ A system font change is only picked up on reboot (the font cache is built at boo
 
 The module drops a CBDT/CBLC Twemoji build of `NotoColorEmoji.ttf` into `system/fonts` and symlinks every emoji font declared in the system font config (`fonts.xml`, or `font_fallback.xml` on Android 15+) to it, so all `und-Zsye` slots resolve to Twemoji.
 
+## Disclaimer & AI statement
+
+- **Disclaimer**: This module modifies the system emoji font at your own risk. The authors are not responsible for any boot loops, rendering glitches or other issues — always keep a working backup before flashing.
+- **AI statement**: All work on this module — code, packaging, documentation and releases — was produced by AI (ZCode) under the direction of @deserthouse, who takes responsibility for its publication.
+
 ## Credits
 
 - **Gontier Julien** — [Twemoji Remastered](https://github.com/Gontier-Julien/Twemoji-Remastered), the upstream this project continues.
