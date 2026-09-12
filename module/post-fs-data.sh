@@ -33,6 +33,10 @@ done
 ok=0
 total=0
 for f in $FONTS; do
+  # A slot whose system file does not exist has nothing to override and
+  # does not affect rendering (e.g. NotoColorEmojiLegacy.ttf on recent
+  # Android) — don't count it against status.
+  [ -e "/system/fonts/$f" ] || continue
   total=$((total+1))
   cmp -s "$SRC" "/system/fonts/$f" && ok=$((ok+1))
 done
