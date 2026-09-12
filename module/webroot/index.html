@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Twemoji Resurrection</title>
+<style>
+  :root { color-scheme: light dark; }
+  body {
+    margin: 0; font-family: sans-serif;
+    background: light-dark(#f7f7fa, #121216); color: light-dark(#222, #e8e8ee);
+  }
+  header {
+    position: sticky; top: 0; z-index: 1; padding: 12px 16px;
+    background: light-dark(#ffffffee, #121216ee); backdrop-filter: blur(8px);
+    border-bottom: 1px solid light-dark(#e3e3ea, #2a2a32);
+  }
+  header h1 { margin: 0 0 4px; font-size: 18px; }
+  #status { font-size: 13px; color: #888; }
+  #status.ok { color: #2e9e44; } #status.warn { color: #c98a00; } #status.bad { color: #d0453c; }
+  nav {
+    display: flex; gap: 6px; overflow-x: auto; padding: 10px 16px 2px;
+    position: sticky; top: 58px; background: light-dark(#f7f7faee, #121216ee);
+  }
+  nav a {
+    flex: none; padding: 6px 12px; border-radius: 999px; text-decoration: none;
+    font-size: 13px; border: 1px solid light-dark(#d8d8e2, #34343e);
+    color: light-dark(#444, #ccc);
+  }
+  section { padding: 4px 16px 24px; }
+  h2 { font-size: 14px; text-transform: uppercase; letter-spacing: .06em; opacity: .65; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(46px, 1fr)); }
+  .grid span {
+    font-size: 30px; text-align: center; padding: 6px 0; cursor: default;
+    border-radius: 8px; font-family: "Noto Color Emoji", "Twemoji", sans-serif;
+  }
+  .grid span:empty::after { content: "□"; opacity: .2; }
+  footer { padding: 12px 16px 28px; font-size: 12px; color: #888; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Twemoji Resurrection <span id="ver"></span></h1>
+  <div id="status">checking module status…</div>
+</header>
+<nav id="nav"></nav>
+<main id="main"></main>
+<footer>
+  Every glyph below is rendered by your <b>current system emoji font</b> — this is
+  the real replacement result, not bundled artwork. A hollow box means the glyph
+  is missing from the installed font.
+</footer>
+<script>
+"use strict";
+
+// Categorized selection covering each Unicode emoji group (incl. Emoji 17.0).
+const GROUPS = {
+"Smileys & Emotion": "😀😃😄😁😆😅🤣😂🙂🙃😉😊😇🥰😍🤩😘😗☺😚😙🥲😋😛😜🤪😝🤑🤗🤭🫢🫣🤫🤔🫡🤐🤨😐😑😶🫥😶‍🌫️😏😒🙄😬😮‍💨🤥🫨😌😔😪🤤😴😷🤒🤕🤢🤮🤧🥵🥶🥴😵😵‍💫🤯🤠🥳🥸😎🤓🧐😕🫤😟🙁☹😮😯😲😳🥺🥹😦😧😨😰😥😢😭😱😖😣😞😓😩😫🥱😤😡😠🤬😈👿💀☠💩🤡👹👺👻👽👾🤖😺😸😹😻😼😽🙀😿😾🙈🙉🙊💌💘💝💖💗💓💞💕💟❣💔❤‍🔥❤‍🩹❤🩷🧡💛💚💙🩵💜🤎🖤🩶🤍💋💯💢💥💫💦💨🕳💬🗯️💭🗯️",
+"People & Body": "👋🤚🖐✋🖖🫱🫲🫳🫴🫷🫸👌🤌🤏✌🤞🫰🤟🤘🤙👈👉👆🖕👇☝🫵👍👎✊👊🤛🤜👏🙌🫶👐🤲🤝🙏✍💅🤳💪🦾🦿🦵🦶👂🦻👃🧠🫀🫁🦷🦴👀👁👅👄🫦👶🧒👦👧🧑👱👨🧔🧔‍♂️🧔‍♀️👨‍🦰👨‍🦱👨‍🦳👨‍🦲👩👩‍🦰🧑‍🦰👩‍🦱🧑‍🦱👩‍🦳🧑‍🦳👩‍🦲🧑‍🦲👱‍♀️👱‍♂️🧓👴👵🙍🙍‍♂️🙍‍♀️🙎🙎‍♂️🙎‍♀️🙅🙅‍♂️🙅‍♀️🙆🙆‍♂️🙆‍♀️💁💁‍♂️💁‍♀️🙋🙋‍♂️🙋‍♀️🧑‍🦯🧑‍🦼🧑‍🦽🧑‍⚕️🧑‍🎓🧑‍🏫🧑‍⚖️🧑‍🌾🧑‍🍳🧑‍🔧🧑‍🏭🧑‍💼🧑‍🔬🧑‍💻🧑‍🎤🧑‍🎨🧑‍✈️🧑‍🚀🧑‍🚒👮👮‍♂️👮‍♀️🕵🕵️‍♂️🕵️‍♀️💂💂‍♂️💂‍♀️🥷👷👷‍♂️👷‍♀️🫅🤴👸👳👳‍♂️👳‍♀️👲🧕🤵🤵‍♂️🤵‍♀️👰👰‍♂️👰‍♀️🤰🫃🫄🤱👩‍🍼👨‍🍼🧑‍🍼👼🫂",
+"Animals & Nature": "🐶🐱🐭🐹🐰🦊🐻🐻‍❄️🐨🐯🦁🐮🐷🐽🐸🐵🙈🙉🙊🐒🐔🐧🐦🐤🐣🐥🦆🦅🦉🦇🐺🐗🐴🦄🐝🪱🐛🦋🐌🐞🐜🪰🪲🪳🦂🐢🐍🦎🦖🦕🐙🦑🦐🦞🦀🪸🐡🐠🐟🐬🐳🐋🦈🐊🐅🐆🦓🦍🦧🦣🐘🦛🦏🐪🐫🦒🦘🐪🐃🐂🐄🐎🐖🐏🐑🦙🐐🦌🐕🐩🦮🐕‍🦺🐈🐈‍⬛🪶🐓🦃🦤🦚🦜🦢🦩🕊🐇🦝🦨🦡🦫🦦🦥🐁🐀🐿🦔🐾🐉🐲🌵🎄🌲🌳🌴🌱🌿☘🍀🎍🍃🍂🍁🪹🪺🍄🍄‍🟫🌷🌹🥀🌺🌸🌼🌻🌞🌝🌛🌜🌚🌕🌖🌗🌘🌑🌒🌓🌔🌙🌎🌍🌏🪐💫⭐🌟✨⚡☄🔥🌪🌈☀🌤⛅🌥☁🌦🌧⛈🌩🌨❄☃⛄🌬💨💧💦☔☂🌊🌫",
+"Food & Drink": "🍏🍎🍐🍊🍋🍌🍉🍇🍓🫐🍈🍒🍑🥭🍍🥥🥝🍅🍆🥑🥦🥬🥒🌶🫑🌽🥕🫒🧄🧅🥔🍠🥐🥯🍞🥖🥨🧀🥚🍳🧈🥞🧇🥓🥩🍗🍖🌭🍔🍟🍕🥪🥙🧆🌮🌯🥗🥘🫕🥫🍝🍜🍲🍛🍣🍱🥟🍤🍙🍚🍘🍥🥠🥮🍢🍡🍧🍨🍦🥧🧁🍰🎂🍮🍭🍬🍫🍿🍩🍪🌰🥜🍯🥛☕🫖🍵🍶🍾🍷🍸🍹🍺🍻🥂🥃🫗🥤🧋🧃🧉🧊🧂",
+"Activity": "🎃🎄🎆🎇🧨✨🎈🎉🎊🎋🎍🎎🎏🎐🎑🧧🎀🎁🎗🎞🎟🎫🎖🏆🏅🥇🥈🥉⚽⚾🥎🏀🏐🏈🏉🎾🥏🎳🏏🏑🏒🥍🏓🏸🥊🥋🥅⛳⛸🎣🤿🎽🎿🛷🥌🛹🎿🎯🪀🪁🔫🎱🔮🎮🕹🎰🎲🧩🧸🪅🪩♠️♥️♦️♣️♟🃏🀄🎴",
+"Travel & Places": "🚗🚕🚙🚌🚎🏎🚓🚑🚒🚐🛻🚚🚛🚜🏍🛵🦽🦼🛺🚲🛴🪜🚨🚔🚍🚘🚖🚡🚠🚟🚃🚋🚞🚝🚄🚅🚈🚂🚆🚇🚊🚉✈🛫🛬🛩💺🛰🚀🛸🚁🛶⛵🚤🛥🛳⛴🚢⚓🪝⛽🚧🚦🚥🗺🗿🗽🗼🏰🏯🏟🎡🎢🎠⛵⛱🏖🏝🏜🌋⛰🏔🗻🏕⛺🏠🏠🏡🏘🏚🏗🏭🏢🏬🏣🏤🏥🏦🏨🏩🏪🏫🏬💒🏛⛪🕌🕍🛕🕋⛩🛤🛣🗾🎑🏞🌅🌄🌠🎇🌇🌆🏙🌃🌌🌉🌊",
+"Objects": "⌚📱📲💻⌨🖥🖨🖱🖲🕹🗜💽💾💿📀📼📷📸📹🎥📽🎞📞☎📟📠📺📻🎙🎚🎛🧭⏱⏲⏰🕰⌛⏳📡🔋🪫🔌💡🔦🕯🪔🧯🛢💸💵💴💶💷🪙💰💳💎⚖🪜🧰🪛🔧🔨⚒🛠⛏🪚🔩⚙🪤🧱⛓🧲🔫💣🧨🪓🔪🗡⚔🛡🚬⚰🪦⚱🏺🔮📿🧿💈⚗🔭🔬🕳🩹🩺🩻💊💉🩸🧬🦠🧫🧪🌡🧹🪠🧺🧻🚽🚰🚿🛁🛀🧼🪥🪒🧽🪣🧴🛎🔑🗝🚪🪑🛋🛏🛌🧸🪆🖼🪞🪟🛍🛒🎁🎈🎏🎀🪄🪅🎊🎉🎎🏮🎐🕯🧧✉📩📨📧💌📥📤📦🏷🪧📪📫📬📭📮📯📜📃📄📑🧾📊📈📉🗒🗓📆📅🗑📇🗃🗳🗄📋📁📂🗂🗞📰📓📔📒📕📗📘📙📚📖🔖🧷🔗📎🖇📐📏🧮📌📍✂🖊🖋✒🖌🖍📝✏🔍🔎🔏🔐🔒🔓",
+"Symbols": "❤🩷🧡💛💚💙🩵💜🤎🖤🩶🤍💔❤‍🔥❤‍🩹❣💕💞💓💗💖💘💝💟☮✝☪🕉☸✡🔯🕎☯☦🛐⛎♈♉♊♋♌♍♎♏♐♑♒♓🆔⚛🉑☢☣📴📳🈶🈚🈸🈺🈷️✴🆚💮🉐㊙㊗🈴🈵🈹🈲🅰🅱🆎🆑🅾🆘❌⭕🛑⛔📛🚫💯💢♨🚷🚯🚳🚱🔞📵🚭❗❓❕❔‼⁉🔅〽⚠🚸🔱⚜🔰♻✅🈯💹❇✳❎🌐💠Ⓜ🌀💤🏧🚾♿🅿🛗🈳🈂🛂🛃🛄🛅🚹🚺🚼🚻🚮🎦📶🈁🔣ℹ🔤🔡🔠🆖🆗🆙🆒🆕🆓0️⃣1️⃣2️⃣3️⃣4️⃣5️⃣6️⃣7️⃣8️⃣9️⃣🔟🔢#️⃣*️⃣⏏▶⏸⏯⏹⏺⏭⏮⏩⏪⏫⏬◀🔼🔽➡⬅⬆⬇↗↘↙↖↕↔↪↩⤴⤵🔀🔁🔂🔄🔃🎵🎶➕➖➗✖️♾️💲💱™©®〰➰➿🔚🔙🔛🔝🔜✔️☑️🔘🔴🟠🟡🟢🔵🟣⚫⚪🟤🔺🔺🔻🔸🔹🔶🔷🔸🔳🔲▪▫◾◽◼◻🟥🟧🟨🟩🟦🟪⬛⬜🟫🔊🔈🔇🔉🔔🔕📣💬💭🗯♠♣♥♦🃏🎴🀄🕐🕑🕒🕓🕔🕕🕖🕗🕘🕙🕚🕛🕛",
+"Flags": "🏁🚩🎌🏴🏳🏳️‍🌈🏳️‍⚧🏴‍☠️🇺🇳🇦🇨🇦🇪🇦🇫🇦🇬🇦🇮🇦🇱🇦🇲🇦🇴🇦🇶🇦🇷🇦🇸🇦🇹🇦🇺🇦🇼🇦🇽🇦🇿🇧🇦🇧🇧🇧🇩🇧🇪🇧🇫🇧🇬🇧🇭🇧🇮🇧🇯🇧🇱🇧🇲🇧🇳🇧🇴🇧🇷🇧🇸🇧🇹🇧🇼🇧🇾🇧🇿🇨🇦🇨🇨🇨🇩🇨🇫🇨🇬🇨🇭🇨🇮🇨🇰🇨🇱🇨🇲🇨🇳🇨🇴🇨🇷🇨🇺🇨🇻🇨🇼🇨🇾🇨🇿🇩🇪🇩🇯🇩🇰🇩🇲🇩🇴🇩🇿🇪🇨🇪🇪🇪🇬🇪🇷🇪🇸🇪🇹🇪🇺🇫🇮🇫🇯🇫🇰🇫🇲🇫🇴🇫🇷🇬🇦🇬🇧🇬🇩🇬🇪🇬🇬🇬🇭🇬🇮🇬🇱🇬🇲🇬🇳🇬🇵🇬🇶🇬🇷🇬🇹🇬🇺🇬🇼🇬🇾🇭🇰🇭🇳🇭🇷🇭🇹🇭🇺🇮🇩🇮🇪🇮🇱🇮🇲🇮🇳🇮🇴🇮🇶🇮🇷🇮🇸🇮🇹🇯🇪🇯🇲🇯🇴🇯🇵🇰🇪🇰🇬🇰🇭🇰🇮🇰🇲🇰🇳🇰🇵🇰🇷🇰🇼🇰🇾🇰🇿🇱🇦🇱🇧🇱🇨🇱🇮🇱🇰🇱🇷🇱🇸🇱🇹🇱🇺🇱🇻🇱🇾🇲🇦🇲🇨🇲🇩🇲🇪🇲🇬🇲🇭🇲🇰🇲🇱🇲🇲🇲🇳🇲🇴🇲🇵🇲🇷🇲🇸🇲🇹🇲🇺🇲🇻🇲🇼🇲🇾🇲🇿🇳🇦🇳🇨🇳🇪🇳🇫🇳🇬🇳🇮🇳🇱🇳🇴🇳🇵🇳🇿🇳🇷🇳🇺🇳🇿🇴🇲🇵🇦🇵🇪🇵🇫🇵🇬🇵🇭🇵🇰🇵🇱🇵🇹🇵🇷🇵🇸🇵🇼🇵🇾🇶🇦🇷🇴🇷🇸🇷🇺🇷🇼🇸🇦🇸🇧🇸🇨🇸🇩🇸🇪🇸🇬🇸🇮🇸🇰🇸🇱🇸🇲🇸🇳🇸🇴🇸🇷🇸🇸🇸🇹🇸🇻🇸🇾🇸🇿🇹🇨🇹🇩🇹🇬🇹🇭🇹🇯🇹🇱🇹🇲🇹🇳🇹🇷🇹🇹🇹🇻🇹🇼🇹🇿🇺🇦🇺🇬🇺🇸🇺🇾🇺🇿🇻🇦🇻🇨🇻🇪🇻🇬🇻🇮🇻🇳🇻🇺🇼🇸🇾🇪🇿🇦🇿🇲🇿🇼"
+};
+
+// Build sections + nav
+const nav = document.getElementById("nav");
+const main = document.getElementById("main");
+for (const [name, chars] of Object.entries(GROUPS)) {
+  const id = name.toLowerCase().replace(/[^a-z]+/g, "-");
+  nav.insertAdjacentHTML("beforeend", `<a href="#${id}">${name}</a>`);
+  const section = document.createElement("section");
+  section.id = id;
+  section.innerHTML = `<h2>${name}</h2>`;
+  const grid = document.createElement("div");
+  grid.className = "grid";
+  // Spread keeps ZWJ sequences (e.g. 👨‍👩‍👧) as single glyphs via Intl
+  const seg = new Intl.Segmenter("en", { granularity: "grapheme" });
+  for (const s of seg.segment(chars)) {
+    const sp = document.createElement("span");
+    sp.textContent = s.segment;
+    sp.title = [...s.segment].map(c => "U+" + c.codePointAt(0).toString(16).toUpperCase().padStart(4, "0")).join(" ");
+    grid.appendChild(sp);
+  }
+  section.appendChild(grid);
+  main.appendChild(section);
+}
+
+// Status: read module.prop via the KernelSU WebUI bridge when available
+// (Magisk WebUIX exposes the same ksu.exec contract); degrade gracefully.
+const st = document.getElementById("status");
+(async () => {
+  try {
+    if (!window.ksu || !ksu.exec) throw 0;
+    const r = await ksu.exec("cat /data/adb/modules/Twemoji-systemless/module.prop");
+    const out = (r.stdout || "") + (r.result ?? "");
+    const desc = (out.match(/^description=(.*)$/m) || [])[1] || "";
+    const ver = (out.match(/^version=(.*)$/m) || [])[1] || "";
+    document.getElementById("ver").textContent = ver;
+    if (/✅/.test(desc)) { st.textContent = desc; st.className = "ok"; }
+    else if (/⚠️/.test(desc)) { st.textContent = desc + " — some emoji slots are not overridden"; st.className = "warn"; }
+    else if (/❌/.test(desc)) { st.textContent = desc + " — check your manager's mount settings"; st.className = "bad"; }
+    else { st.textContent = desc || "installed"; }
+  } catch {
+    st.textContent = "manager without WebUI bridge — emoji below still reflect your system font";
+  }
+})();
+</script>
+</body>
+</html>

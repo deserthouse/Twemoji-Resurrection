@@ -29,6 +29,7 @@ A system font change is only picked up on reboot (the font cache is built at boo
   - `✅ Twemoji active (n/n emoji fonts)` — fully working
   - `⚠️ Twemoji partial (x/n emoji fonts)` — some slots not overridden
   - `❌ Twemoji not active` — mounting failed; check your manager's mount settings
+- **WebUI** — tap **Open** on the module in KernelSU / SukiSU / APatch (or Magisk with WebUIX) to browse all emoji by category. Everything is rendered by the *current system emoji font*, so it doubles as a live verification that the replacement took effect; it also shows the module's boot status when the manager provides the WebUI bridge.
 
 ## How it works
 

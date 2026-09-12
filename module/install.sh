@@ -28,7 +28,7 @@ REPLACE="
 # Set what we want to display when installing the module
 print_modname() {
   ui_print "**************************************"
-  ui_print "      Twemoji Resurrection v17.0.3"
+  ui_print "      Twemoji Resurrection v17.0.3 (54)"
   ui_print "     Maintained by Gontier Julien & deserthouse"
   ui_print "**************************************"
 }
@@ -44,10 +44,14 @@ on_install() {
   unzip -o "$ZIPFILE" 'post-fs-data.sh' -d $MODPATH >&2
   chmod 0755 $MODPATH/post-fs-data.sh
   [[ -d /sbin/.core/mirror ]] && MIRRORPATH=/sbin/.core/mirror || unset MIRRORPATH
-  # Android 15+ deprecates fonts.xml in favor of the generated font_fallback.xml;
-  # try both and use whichever yields results.
-  FONTFILES=$(sed -ne '/<family lang="und-Zsye".*>/,/<\/family>/ {s/.*<font weight="400" style="normal">\(.*\)<\/font>.*/\1/p;}' $MIRRORPATH/system/etc/fonts.xml)
-  [ -n "$FONTFILES" ] || FONTFILES=$(sed -ne '/<family lang="und-Zsye".*>/,/<\/family>/ {s/.*<font weight="400" style="normal">\(.*\)<\/font>.*/\1/p;}' $MIRRORPATH/system/etc/font_fallback.xml)
+  # Tolerant emoji-slot parser, same as post-fs-data.sh: family lang may list
+  # several languages and font entries may carry any weight/style attributes —
+  # collect every font slot so OEM vendor emoji fonts don't survive as
+  # partial fallbacks. Android 15+ deprecates fonts.xml in favor of the
+  # generated font_fallback.xml; try both and use whichever yields results.
+  FONTFILES=$(sed -ne '/<family[^>]*lang="[^"]*und-Zsye[^"]*"[^>]*>/,/<\/family>/ {s/.*<font[^>]*>\([^<]*\)<\/font>.*/\1/p;}' $MIRRORPATH/system/etc/fonts.xml)
+  [ -n "$FONTFILES" ] || FONTFILES=$(sed -ne '/<family[^>]*lang="[^"]*und-Zsye[^"]*"[^>]*>/,/<\/family>/ {s/.*<font[^>]*>\([^<]*\)<\/font>.*/\1/p;}' $MIRRORPATH/system/etc/font_fallback.xml)
+  FONTFILES=$(echo "$FONTFILES" | tr ' ' '\n' | sort -u)
   for font in $FONTFILES
   do
     ln -s /system/fonts/NotoColorEmoji.ttf $MODPATH/system/fonts/$font

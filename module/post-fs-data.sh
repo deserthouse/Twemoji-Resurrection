@@ -17,10 +17,14 @@ mount_font() {
 }
 
 # Same parser as install.sh: emoji (und-Zsye) entries from the font config.
+# Tolerant of OEM variants: family lang may list several languages, and font
+# entries may carry any weight/style attributes — collect every font slot in
+# the family so vendor emoji fonts don't survive as partial fallbacks.
 # Android 15+ deprecates fonts.xml in favor of the generated font_fallback.xml;
 # try both and use whichever yields results.
-FONTS=$(sed -ne '/<family lang="und-Zsye".*>/,/<\/family>/ {s/.*<font weight="400" style="normal">\(.*\)<\/font>.*/\1/p;}' /system/etc/fonts.xml 2>/dev/null)
-[ -n "$FONTS" ] || FONTS=$(sed -ne '/<family lang="und-Zsye".*>/,/<\/family>/ {s/.*<font weight="400" style="normal">\(.*\)<\/font>.*/\1/p;}' /system/etc/font_fallback.xml 2>/dev/null)
+FONTS=$(sed -ne '/<family[^>]*lang="[^"]*und-Zsye[^"]*"[^>]*>/,/<\/family>/ {s/.*<font[^>]*>\([^<]*\)<\/font>.*/\1/p;}' /system/etc/fonts.xml 2>/dev/null)
+[ -n "$FONTS" ] || FONTS=$(sed -ne '/<family[^>]*lang="[^"]*und-Zsye[^"]*"[^>]*>/,/<\/family>/ {s/.*<font[^>]*>\([^<]*\)<\/font>.*/\1/p;}' /system/etc/font_fallback.xml 2>/dev/null)
+FONTS=$(echo "$FONTS" | tr ' ' '\n' | sort -u)
 
 for f in $FONTS; do
   mount_font "$f"

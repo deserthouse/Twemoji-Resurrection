@@ -1,3 +1,9 @@
+# v17.0.3 (54)
+
+- Fixed partial emoji replacement: the font-slot parser now tolerates OEM `fonts.xml` variants (multi-language `lang` attributes, fonts with extra attributes like `toneId`), so vendor emoji fonts no longer survive as partial fallbacks
+- Added a WebUI ("Open" button in the manager's module list): browse all emoji by category to verify the replacement — rendered with the actual system font
+- Show the build number in the module version, e.g. `v17.0.3 (54)`; the version tracks upstream Twemoji releases
+
 # v17.0.3 (53)
 
 - Twemoji 17.0.3 (Emoji 17.0 / Unicode 17.0)
