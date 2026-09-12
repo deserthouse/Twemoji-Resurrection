@@ -42,4 +42,9 @@ The module drops a CBDT/CBLC Twemoji build of `NotoColorEmoji.ttf` into `system/
 
 ## License
 
-The module scripts are licensed under the [GNU GPL v3](LICENSE). The Twemoji graphics and the bundled font remain under their original licenses (CC-BY 4.0 for the graphics; see the font project for font licensing details).
+The module scripts are licensed under the [GNU GPL v3](LICENSE).
+
+The bundled font and the Twemoji artwork it contains are **not** covered by that license and remain under their original terms:
+
+- Twemoji artwork: [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/) — © 2014–2021 Twitter; © 2022–present the [Twemoji](https://github.com/jdecked/twemoji) maintainers.
+- Bundled `NotoColorEmoji.ttf`: built by [twemoji-color-font](https://github.com/13rac1/twemoji-color-font), whose font files are licensed CC-BY 4.0 (© 2016–2024 Brad Erickson, © 2022–present Jason Sofonia & Justine De Caires, © 2014–2021 Twitter).

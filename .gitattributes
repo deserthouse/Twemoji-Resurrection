@@ -1,0 +1,4 @@
+# Shell scripts must keep LF endings: they run under mksh/toybox on Android
+* text=auto eol=lf
+*.ttf binary
+*.png binary
