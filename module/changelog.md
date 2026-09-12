@@ -1,3 +1,7 @@
+# v17.0.3 (55)
+
+- Fixed the WebUI "Open" button not appearing in the manager: the installer did not extract `webroot/` into the installed module directory (build 54 shipped the file in the zip but never installed it)
+
 # v17.0.3 (54)
 
 - Fixed partial emoji replacement: the font-slot parser now tolerates OEM `fonts.xml` variants (multi-language `lang` attributes, fonts with extra attributes like `toneId`), so vendor emoji fonts no longer survive as partial fallbacks

@@ -28,7 +28,7 @@ REPLACE="
 # Set what we want to display when installing the module
 print_modname() {
   ui_print "**************************************"
-  ui_print "      Twemoji Resurrection v17.0.3 (54)"
+  ui_print "      Twemoji Resurrection v17.0.3 (55)"
   ui_print "     Maintained by Gontier Julien & deserthouse"
   ui_print "**************************************"
 }
@@ -43,6 +43,9 @@ on_install() {
   # Self-mount script for KernelSU/SukiSU/APatch without a mount metamodule
   unzip -o "$ZIPFILE" 'post-fs-data.sh' -d $MODPATH >&2
   chmod 0755 $MODPATH/post-fs-data.sh
+  # WebUI (emoji verification gallery): managers render the "Open" button
+  # only when webroot/index.html exists in the installed module dir
+  unzip -o "$ZIPFILE" 'webroot/*' -d $MODPATH >&2
   [[ -d /sbin/.core/mirror ]] && MIRRORPATH=/sbin/.core/mirror || unset MIRRORPATH
   # Tolerant emoji-slot parser, same as post-fs-data.sh: family lang may list
   # several languages and font entries may carry any weight/style attributes —
