@@ -80,8 +80,12 @@ for (const [name, chars] of Object.entries(GROUPS)) {
   // Spread keeps ZWJ sequences (e.g. 👨‍👩‍👧) as single glyphs via Intl
   const seg = new Intl.Segmenter("en", { granularity: "grapheme" });
   for (const s of seg.segment(chars)) {
+    let t = s.segment;
+    // Legacy symbols (☺ ⚠ ❄ ☂ …) default to TEXT presentation and render
+    // as monochrome outlines unless explicitly followed by VS16 (U+FE0F).
+    if ([...t].length === 1 && !t.endsWith("\uFE0F")) t += "\uFE0F";
     const sp = document.createElement("span");
-    sp.textContent = s.segment;
+    sp.textContent = t;
     sp.title = [...s.segment].map(c => "U+" + c.codePointAt(0).toString(16).toUpperCase().padStart(4, "0")).join(" ");
     grid.appendChild(sp);
   }

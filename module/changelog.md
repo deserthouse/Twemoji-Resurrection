@@ -1,3 +1,7 @@
+# v17.0.3 (56)
+
+- WebUI: force emoji presentation (VS16) on legacy text-default symbols — they rendered as monochrome outlines in the gallery, which looked like a partial replacement even though the system font was correctly replaced
+
 # v17.0.3 (55)
 
 - Fixed the WebUI "Open" button not appearing in the manager: the installer did not extract `webroot/` into the installed module directory (build 54 shipped the file in the zip but never installed it)
