@@ -42,7 +42,7 @@ The module drops a CBDT/CBLC Twemoji build of `NotoColorEmoji.ttf` into `system/
 
 ## Credits
 
-- **Gontier Julien** — [Twemoji Remastered](https://github.com/Gontier-Julien/Twemoji-Remastered), the upstream this project continues.
+- **Gontier Julien** (Codeberg: [Snowy](https://codeberg.org/Snowy/Twemoji-Remastered), formerly [Gontier-Julien](https://github.com/Gontier-Julien/Twemoji-Remastered) on GitHub) — [Twemoji Remastered](https://codeberg.org/Snowy/Twemoji-Remastered), the upstream this project continues.
 - **Twitter / X and Twemoji contributors** — the emoji artwork.
 - Font built from the [twemoji-color-font](https://github.com/13rac1/twemoji-color-font) CBDT/CBLC packaging.
 
