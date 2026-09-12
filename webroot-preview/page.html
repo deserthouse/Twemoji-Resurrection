@@ -75,6 +75,15 @@
   is missing from the installed font.
 </footer>
 <script>
+// README preview build: mock manager bridge with realistic slot data
+window.ksu = { exec: async () => ({ stdout: [
+  "NotoColorEmoji.ttf\tOK",
+  "NotoColorEmojiFlags.ttf\tOK",
+  "NotoColorEmojiLegacy.ttf\tABSENT",
+  "version=v17.0.3 (57)"
+].join("\n") }) };
+</script>
+<script>
 "use strict";
 
 // Categorized selection covering each Unicode emoji group (incl. Emoji 17.0).

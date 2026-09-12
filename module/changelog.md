@@ -1,3 +1,7 @@
+# v17.0.3 (57)
+
+- WebUI: live, detailed self-check — per-slot verification (serving Twemoji / stock font / absent) with a progress bar, running the same logic as the boot-time check through the manager's root shell bridge, with graceful fallback to the boot-time description
+
 # v17.0.3 (56)
 
 - WebUI: force emoji presentation (VS16) on legacy text-default symbols — they rendered as monochrome outlines in the gallery, which looked like a partial replacement even though the system font was correctly replaced
