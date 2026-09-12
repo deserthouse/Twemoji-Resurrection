@@ -38,7 +38,7 @@ The module drops a CBDT/CBLC Twemoji build of `NotoColorEmoji.ttf` into `system/
 ## Disclaimer & AI statement
 
 - **Disclaimer**: This module modifies the system emoji font at your own risk. The authors are not responsible for any boot loops, rendering glitches or other issues — always keep a working backup before flashing.
-- **AI statement**: All work on this module — code, packaging, documentation and releases — was produced by AI (ZCode) under the direction of @deserthouse, who takes responsibility for its publication.
+- **AI statement**: All work on this module — code, packaging, documentation and releases — was produced by AI.
 
 ## Credits
 
